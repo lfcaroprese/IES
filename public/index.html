@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ICH · Calidad habitacional EPH</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#1c2733;--mut:#667587;--line:#e1e6ec;--pri:#1f6f8b;--red:#b5443c;--amb:#d99a2b;--grn:#3f8a55;--vio:#7a5ea8;--blu:#3b6fb6}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#12303c;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:650}
+header .sub{color:#a9c3cf;font-size:12.5px}
+#demoBanner{display:none;background:#fff3cd;color:#664d03;border-bottom:1px solid #ecd48a;padding:7px 20px;font-size:13px}
+.wrap{display:grid;grid-template-columns:290px 1fr;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+aside{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;align-self:start;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+aside h3{margin:14px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+aside h3:first-child{margin-top:0}
+.w{display:grid;grid-template-columns:1fr 46px;gap:2px 8px;align-items:center;margin-bottom:6px}
+.w label{font-size:13px}.w .pct{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;font-size:13px}
+.w input[type=range]{grid-column:1/3;width:100%;accent-color:var(--pri)}
+.w.sj label::after{content:" (fuera del índice)";color:var(--mut);font-size:11px}
+.w.sj.on label::after{content:" (incluida)";color:var(--pri)}
+.presets{display:flex;gap:6px;flex-wrap:wrap}
+button,.btn{font:inherit;border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 10px;cursor:pointer;color:var(--ink)}
+button:hover{border-color:var(--pri)}
+button.pri{background:var(--pri);color:#fff;border-color:var(--pri)}
+select,input[type=number]{font:inherit;border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:#fff}
+input[type=number]{width:70px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.tab{padding:7px 13px;border-radius:8px;border:1px solid transparent;cursor:pointer;color:var(--mut);background:transparent}
+.tab.on{background:var(--card);border-color:var(--line);color:var(--ink);font-weight:600}
+section.page{display:none}section.page.on{display:block}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.card h4{margin:0 0 2px;font-size:14px}.card .d{color:var(--mut);font-size:12px;margin-bottom:8px}
+.ch{position:relative;height:290px}.ch.s{height:190px}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.kpi .l{color:var(--mut);font-size:12px}.kpi .v{font-size:24px;font-weight:700;margin:2px 0}.kpi .s{font-size:12px;color:var(--mut)}
+.good{color:var(--grn)}.bad{color:var(--red)}
+.note{border-left:4px solid var(--pri);background:#eef6f9;padding:10px 12px;border-radius:6px;margin-bottom:14px}
+.note.warn{border-color:var(--amb);background:#fff8e6}
+table.heat{border-collapse:collapse;width:100%;font-size:12px}
+table.heat th{font-weight:600;color:var(--mut);padding:3px 5px;text-align:center}
+table.heat th.rl{text-align:left;white-space:nowrap}
+table.heat td{padding:5px 4px;text-align:center;border:1px solid #fff;font-variant-numeric:tabular-nums}
+table.t{border-collapse:collapse;width:100%}table.t td,table.t th{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left}
+.drop{border:2px dashed #b8c4d0;border-radius:10px;padding:26px;text-align:center;background:#fafbfc}
+.drop.hov{border-color:var(--pri);background:#eef6f9}
+.ok{color:var(--grn)}.err{color:var(--red)}
+#busy{position:fixed;right:16px;bottom:16px;background:#12303c;color:#fff;padding:6px 12px;border-radius:8px;display:none;font-size:12px}
+.small{font-size:12px;color:var(--mut)}
+@media(max-width:1000px){.wrap{grid-template-columns:1fr}aside{position:static;max-height:none}.g2,.g3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header><h1>Índice de Calidad Habitacional · EPH</h1><span class="sub">Base Hogar · escala 1 (peor) a 5 (mejor) · ponderación editable</span><a href="laboral.html" style="margin-left:auto;color:#fff;text-decoration:none;border:1px solid #4d7686;border-radius:7px;padding:4px 10px;font-size:13px">Mercado laboral →</a></header>
+<div id="demoBanner"><b>Datos sintéticos de ejemplo.</b> Los gráficos son una demostración del dashboard, no reflejan la realidad. Cargá tus bases en la pestaña «Carga».</div>
+<div class="wrap">
+<aside>
+  <h3>Ponderación del índice</h3>
+  <div id="sliders"></div>
+  <div class="presets">
+    <button data-p="base">Base</button><button data-p="iguales">Iguales</button>
+    <button data-p="infra">Infraestructura</button><button data-p="sj">Con seg. jurídica</button>
+  </div>
+  <div class="small" style="margin-top:6px">Los pesos se normalizan solos. ICH = 1 + 4 × Σ(peso × subíndice).</div>
+  <h3>Cálculo</h3>
+  <div class="row"><span>Ponderar por</span><select id="ponderar"><option value="personas">personas</option><option value="hogares">hogares</option></select></div>
+  <div class="row"><span>Serie</span><select id="agreg"><option value="anio">promedio anual</option><option value="trimestre">por trimestre</option></select></div>
+  <div class="small" style="margin:-2px 0 6px">Promedio anual: junta los trimestres tildados de cada año (cada trimestre pesa igual) para bajar el ruido de la muestra.</div>
+  <div class="row"><span>Trimestres</span>
+    <label><input type="checkbox" class="tr" value="1" checked>1</label><label><input type="checkbox" class="tr" value="2">2</label>
+    <label><input type="checkbox" class="tr" value="3">3</label><label><input type="checkbox" class="tr" value="4">4</label></div>
+  <div class="row"><span>Umbral «bajo» &lt;</span><input type="number" id="ub" value="2" step="0.1" min="1" max="5"></div>
+  <div class="row"><span>Umbral «alto» ≥</span><input type="number" id="ua" value="4" step="0.1" min="1" max="5"></div>
+  <div class="row"><label><input type="checkbox" id="boot" checked> Intervalos de confianza (bootstrap)</label></div>
+  <button id="csv" style="margin-top:6px">Descargar serie (CSV)</button>
+</aside>
+<main>
+  <div class="tabs" id="tabs"></div>
+
+  <section class="page" id="p-carga">
+    <div class="card">
+      <h4>Cargar bases Hogar de la EPH</h4>
+      <div class="d">Aceptá .xlsx, .xls, .csv o .txt (usu_hogar). Podés subir varios archivos juntos; el período se lee de las columnas ANO4 y TRIMESTRE. Se procesan en tu navegador: nada se envía a ningún servidor.</div>
+      <div class="drop" id="drop"><p><b>Arrastrá los archivos acá</b> o</p><input type="file" id="file" multiple accept=".xlsx,.xls,.xlsm,.csv,.txt"></div>
+      <div class="row" style="margin-top:10px"><button id="demoBtn">Cargar datos de ejemplo (sintéticos)</button><button id="clearBtn">Vaciar datos</button></div>
+      <div id="msgs" style="margin-top:10px"></div>
+      <div id="saveNote" style="margin-top:6px"></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h4>Períodos cargados</h4><div id="loaded" class="small">Todavía no hay datos.</div></div>
+  </section>
+
+  <section class="page" id="p-resumen">
+    <div class="kpis" id="kpis"></div>
+    <div id="lectura"></div>
+    <div class="grid g2">
+      <div class="card"><h4>Evolución del ICH medio</h4><div class="d">Banda: IC 95% bootstrap por vivienda (subestima algo el error real)</div><div class="ch"><canvas id="c_ich"></canvas></div></div>
+      <div class="card"><h4>Cola baja y cola alta</h4><div class="d" id="d_colas"></div><div class="ch"><canvas id="c_colas"></canvas></div></div>
+      <div class="card"><h4>Distribución por tramos de ICH</h4><div class="d">% de la población en cada tramo</div><div class="ch"><canvas id="c_dist"></canvas></div></div>
+      <div class="card"><h4>¿Qué explica el cambio?</h4><div class="d" id="d_wf"></div><div class="ch"><canvas id="c_wf"></canvas></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-dims">
+    <div class="note">Cada dimensión en escala 1–5 (1 + 4 × subíndice). Es independiente de los pesos: muestra cómo evoluciona cada componente.</div>
+    <div class="grid g3" id="dimGrid"></div>
+    <div class="card" style="margin-top:14px"><h4>Perfil: primer vs último período</h4><div class="ch"><canvas id="c_radar"></canvas></div></div>
+  </section>
+
+  <section class="page" id="p-terr">
+    <div class="grid g2">
+      <div class="card"><h4>ICH por región</h4><div class="d">El GBA se muestra abierto en CABA y Partidos del GBA. Composición de cada región en «Metodología».</div><div class="ch"><canvas id="c_reg"></canvas></div></div>
+      <div class="card"><h4>Región × período</h4><div id="h_reg"></div></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h4>Ranking de aglomerados</h4>
+      <div class="row"><span>Período</span><select id="aglPer"></select><span class="small">Se muestran aglomerados con al menos 15 hogares en la muestra.</span></div>
+      <div class="ch" id="aglBox" style="height:640px"><canvas id="c_agl"></canvas></div></div>
+  </section>
+
+  <section class="page" id="p-ing">
+    <div class="grid g2">
+      <div class="card"><h4>ICH por decil de ingreso del hogar (DECIFR)</h4><div class="d">Deciles 1 (más pobres) a 10 (más ricos)</div><div id="h_dec"></div></div>
+      <div class="card"><h4>Brecha entre deciles</h4><div class="d">Evolución del ICH en D1, D5 y D10</div><div class="ch"><canvas id="c_dec"></canvas></div></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h4>Brecha D10 − D1</h4><div class="d">Diferencia de ICH entre el decil más rico y el más pobre. Si baja, la desigualdad habitacional se reduce.</div><div class="ch s"><canvas id="c_gap"></canvas></div></div>
+  </section>
+
+  <section class="page" id="p-sj">
+    <div class="note warn"><b>Seguridad jurídica de la tenencia (II7).</b> Se mide aparte del ICH (peso 0 por defecto). Los puntajes por categoría son una convención editable, no un dato de la EPH: cambialos abajo y se recalcula todo.</div>
+    <div class="kpis" id="sjKpis" style="grid-template-columns:repeat(3,1fr)"></div>
+    <div class="grid g2">
+      <div class="card"><h4>Índice de seguridad jurídica (1–5)</h4><div class="ch"><canvas id="c_sj"></canvas></div></div>
+      <div class="card"><h4>Tenencia insegura y doble déficit</h4><div class="d" id="d_dd"></div><div class="ch"><canvas id="c_dd"></canvas></div></div>
+      <div class="card"><h4>Composición por tipo de tenencia</h4><div class="d">% de la población</div><div class="ch"><canvas id="c_ten"></canvas></div></div>
+      <div class="card"><h4>ICH físico según tenencia</h4><div class="row"><span>Período</span><select id="tenPer"></select></div><div class="ch"><canvas id="c_tenich"></canvas></div></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h4>Puntaje por categoría (0 a 1)</h4><div id="sjTable"></div></div>
+  </section>
+
+  <section class="page" id="p-met">
+    <div class="card" id="metBox"></div>
+  </section>
+</main>
+</div>
+<div id="busy">Calculando…</div>
+<script src="vendor/chart.umd.js"></script>
+<script src="js/api.js"></script>
+<script>
+const DIMS=["mat","agua","sanea","hacin","energ","entorno","sjt"];
+const LAB={mat:"Materiales",agua:"Agua",sanea:"Saneamiento",hacin:"Hacinamiento",energ:"Energía de cocción",entorno:"Entorno",sjt:"Seguridad jurídica"};
+const PRESETS={base:{mat:20,agua:15,sanea:25,hacin:25,energ:5,entorno:10,sjt:0},iguales:{mat:1,agua:1,sanea:1,hacin:1,energ:1,entorno:1,sjt:0},
+ infra:{mat:10,agua:25,sanea:35,hacin:15,energ:10,entorno:5,sjt:0},sj:{mat:16,agua:12,sanea:20,hacin:20,energ:4,entorno:8,sjt:20}};
+const TEN={1:"Propietario vivienda y terreno",2:"Propietario solo vivienda",3:"Inquilino",4:"Ocupante por impuestos/expensas",5:"Ocupante en relación de dependencia",6:"Ocupante gratuito (permiso)",7:"Ocupante de hecho (sin permiso)",8:"En sucesión",9:"Otra situación"};
+const SJT0={1:1,2:.8,3:.6,4:.5,5:.3,6:.3,7:0,8:.5,9:.3};
+const COL=["#1f6f8b","#b5443c","#d99a2b","#3f8a55","#7a5ea8","#3b6fb6","#8a6d3b","#c2577e","#4f9da6"];
+const S={pesos:{...PRESETS.base},sjt:{...SJT0},data:null,charts:{},tab:"carga",loaded:[]};
+const $=id=>document.getElementById(id);
+const fmt=(x,d=2)=>x==null||isNaN(x)?"–":Number(x).toFixed(d);
+const sg=(x,d=2)=>x==null?"–":(x>=0?"+":"")+Number(x).toFixed(d);
+
+/* ---------- UI base ---------- */
+const TABS=[["carga","Carga"],["resumen","Resumen"],["dims","Dimensiones"],["terr","Territorio"],["ing","Ingreso"],["sj","Seguridad jurídica"],["met","Metodología"]];
+$("tabs").innerHTML=TABS.map(([k,l])=>`<div class="tab" data-t="${k}">${l}</div>`).join("");
+$("tabs").onclick=e=>{const t=e.target.dataset.t;if(t)go(t)};
+function go(t){S.tab=t;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.t==t));
+ document.querySelectorAll("section.page").forEach(x=>x.classList.toggle("on",x.id=="p-"+t));if(S.data)render()}
+$("sliders").innerHTML=DIMS.map(k=>`<div class="w ${k=="sjt"?"sj":""}" id="w_${k}"><label>${LAB[k]}</label><span class="pct" id="pc_${k}"></span><input type="range" min="0" max="100" step="1" id="r_${k}"></div>`).join("");
+function syncSliders(){const tot=DIMS.reduce((a,k)=>a+S.pesos[k],0)||1;
+ DIMS.forEach(k=>{$("r_"+k).value=S.pesos[k];$("pc_"+k).textContent=(100*S.pesos[k]/tot).toFixed(1)+"%"});
+ $("w_sjt").classList.toggle("on",S.pesos.sjt>0)}
+DIMS.forEach(k=>$("r_"+k).oninput=e=>{S.pesos[k]=+e.target.value;syncSliders();schedule()});
+document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.pesos={...PRESETS[b.dataset.p]};syncSliders();schedule()});
+["ponderar","ub","ua","boot","agreg"].forEach(id=>$(id).onchange=schedule);
+document.querySelectorAll(".tr").forEach(c=>c.onchange=schedule);
+let timer;function schedule(){clearTimeout(timer);timer=setTimeout(compute,300)}
+syncSliders();
+
+/* ---------- API ---------- */
+const post=(url,body)=>API.post(url,body);
+API.onProgress=t=>{$("busy").textContent=t};
+async function compute(){
+ if(!S.loaded.length){return}
+ const trimestres=[...document.querySelectorAll(".tr:checked")].map(c=>+c.value);
+ $("busy").textContent="Calculando…";$("busy").style.display="block";
+ const r=await post("/api/compute",{pesos:S.pesos,trimestres,ponderar:$("ponderar").value,agregacion:$("agreg").value,umbral_bajo:+$("ub").value,umbral_alto:+$("ua").value,boot:$("boot").checked?200:0,sjt_scores:S.sjt});
+ $("busy").style.display="none";
+ if(r.error){S.data=null;alert(r.error);return}
+ S.data=r;fillSelects();render()}
+function setLoaded(r){S.loaded=r.periodos||[];$("demoBanner").style.display=r.demo?"block":"none";
+ $("saveNote").innerHTML=(r.avisos||[]).map(a=>`<div class="err">${a}</div>`).join("")+(r.guardado?`<div class="ok">✓ Las bases quedan guardadas en este navegador: al recargar o actualizar la web no hace falta volver a subirlas.</div>`:(r.demo||!S.loaded.length?"":`<div class="small">Estos datos no se guardan en este navegador.</div>`));
+ $("loaded").innerHTML=S.loaded.length?`<table class="t"><tr><th>Período</th><th>Hogares</th></tr>${S.loaded.map(p=>`<tr><td>${p.periodo}</td><td>${p.hogares.toLocaleString("es-AR")}</td></tr>`).join("")}</table>`:"Todavía no hay datos."}
+async function upload(files){
+ $("busy").style.display="block";$("busy").textContent="Procesando archivos…";
+ const r=await API.upload("/api/upload",files);$("busy").style.display="none";
+ $("msgs").innerHTML=r.archivos.map(a=>`<div class="${a.ok?"ok":"err"}">${a.ok?"✓":"✗"} ${a.archivo}: ${a.msg}</div>`).join("");
+ setLoaded(r);if(S.loaded.length){await compute();if(S.data)go("resumen")}}
+$("file").onchange=e=>upload(e.target.files);
+const dz=$("drop");["dragover","dragenter"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("hov")}));
+["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("hov")}));
+dz.addEventListener("drop",e=>upload(e.dataTransfer.files));
+$("demoBtn").onclick=async()=>{$("busy").style.display="block";const r=await post("/api/demo");setLoaded(r);await compute();if(S.data)go("resumen")};
+$("clearBtn").onclick=async()=>{if(!confirm("Se borran los datos cargados, incluidos los guardados en este navegador. ¿Seguir?"))return;const r=await post("/api/reset");setLoaded(r);S.data=null;$("msgs").innerHTML="";go("carga")};
+
+/* ---------- helpers de gráficos ---------- */
+function mk(id,cfg){if(S.charts[id])S.charts[id].destroy();const el=$(id);if(!el)return;
+ cfg.options=Object.assign({responsive:true,maintainAspectRatio:false,animation:false},cfg.options||{});
+ S.charts[id]=new Chart(el,cfg)}
+const hideBand={labels:{filter:i=>!i.text.startsWith("_"),boxWidth:12}};
+function lineBand(id,labels,main,lo,hi,color,name,extra={}){
+ const ds=[];
+ if(lo&&lo.some(v=>v!=null)){ds.push({label:"_lo",data:lo,borderWidth:0,pointRadius:0,fill:false});
+  ds.push({label:"_hi",data:hi,borderWidth:0,pointRadius:0,fill:"-1",backgroundColor:color+"33"})}
+ ds.push({label:name,data:main,borderColor:color,backgroundColor:color,pointRadius:3,tension:.2,spanGaps:true});
+ mk(id,{type:"line",data:{labels,datasets:ds},options:Object.assign({plugins:{legend:hideBand},interaction:{mode:"index",intersect:false}},extra)})}
+function heat(el,rows,cols,val,fmtN=2){
+ const vs=[];rows.forEach(r=>cols.forEach(c=>{const v=val(r.k,c);if(v!=null)vs.push(v)}));
+ const mn=Math.min(...vs),mx=Math.max(...vs);
+ const col=v=>{const t=mx>mn?(v-mn)/(mx-mn):.5;const a=[192,57,43],b=[241,196,15],c=[46,139,87];
+  const m=t<.5?[a,b,t*2]:[b,c,(t-.5)*2];const rgb=m[0].map((x,i)=>Math.round(x+(m[1][i]-x)*m[2]));return`rgb(${rgb})`};
+ el.innerHTML=`<table class="heat"><tr><th></th>${cols.map(c=>`<th>${c}</th>`).join("")}</tr>${rows.map(r=>`<tr><th class="rl">${r.l}</th>${cols.map(c=>{const v=val(r.k,c);return v==null?`<td style="background:#eee">·</td>`:`<td style="background:${col(v)};color:#111">${v.toFixed(fmtN)}</td>`}).join("")}</tr>`).join("")}</table>`}
+function fillSelects(){const P=S.data.periodos;
+ [["aglPer"],["tenPer"]].forEach(([id])=>{const cur=$(id).value;$(id).innerHTML=P.map(p=>`<option>${p}</option>`).join("");$(id).value=P.includes(cur)?cur:P[P.length-1];$(id).onchange=render})}
+
+/* ---------- render ---------- */
+function render(){const D=S.data;if(!D)return;({resumen:rResumen,dims:rDims,terr:rTerr,ing:rIng,sj:rSJ,met:rMet}[S.tab]||(()=>{}))()}
+const ser=k=>S.data.serie.map(r=>r[k]==null?null:r[k]);
+
+function rResumen(){
+ const D=S.data,P=D.periodos,s=D.serie,last=s[s.length-1],ub=+$("ub").value,ua=+$("ua").value;
+ const df=D.diferencia,tn=D.tendencia;
+ const cls=v=>v==null?"":v>0?"good":"bad";
+ $("kpis").innerHTML=[
+  [`ICH ${last.periodo}`,fmt(last.ich),last.ich_lo!=null?`IC95% ${fmt(last.ich_lo)}–${fmt(last.ich_hi)}`:`n=${last.n.toLocaleString("es-AR")} hogares`],
+  [`Cambio ${df?df.desde+"→"+df.hasta:""}`,df?`<span class="${cls(df.dif)}">${sg(df.dif,3)}</span>`:"–",df&&df.lo!=null?`IC95% ${sg(df.lo,3)} a ${sg(df.hi,3)}`:"sin intervalos"],
+  ["Pendiente anual",tn?`<span class="${cls(tn.pend)}">${sg(tn.pend,4)}</span>`:"–",tn&&tn.pend_lo!=null?`IC95% ${sg(tn.pend_lo,4)} a ${sg(tn.pend_hi,4)}`:"requiere ≥3 períodos"],
+  [`% con ICH < ${ub}`,fmt(last.pct_bajo,1)+"%",last.pct_bajo_lo!=null?`IC95% ${fmt(last.pct_bajo_lo,1)}–${fmt(last.pct_bajo_hi,1)}`:""],
+  [`% con ICH ≥ ${ua}`,fmt(last.pct_alto,1)+"%",`descartados por faltantes: ${fmt(D.descartados_pct,1)}%`]
+ ].map(([l,v,sub])=>`<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${sub}</div></div>`).join("");
+ let txt="";
+ if(df&&df.lo!=null){const sig=df.lo>0?"mejoró":df.hi<0?"empeoró":null;
+  txt=sig?`<div class="note">Entre <b>${df.desde}</b> y <b>${df.hasta}</b> la calidad habitacional <b>${sig}</b> (${sg(df.dif,3)} puntos) y el intervalo no incluye 0. Con pesos distintos la conclusión puede cambiar: probá otros en el panel izquierdo.</div>`
+   :`<div class="note warn">El cambio entre <b>${df.desde}</b> y <b>${df.hasta}</b> (${sg(df.dif,3)}) <b>no se distingue del ruido muestral</b>: el intervalo incluye 0. Mirá la pendiente de toda la serie antes de concluir.</div>`}
+ else txt=`<div class="note warn">Activá los intervalos de confianza para saber si el cambio es distinguible del ruido muestral.</div>`;
+ const tq=s.map(r=>r.trims);const tmin=Math.min(...tq),tmax=Math.max(...tq);
+ if(D.anual)txt=`<div class="note">Cada punto es el <b>promedio anual</b> de ${tmin==tmax?tmin:tmin+" a "+tmax} trimestre(s) por año. Los hogares del panel que reaparecen en varios trimestres se agrupan por vivienda en el bootstrap, así que el intervalo no se achica de más por repetir la misma vivienda.</div>`+txt;
+ $("lectura").innerHTML=txt;
+ lineBand("c_ich",P,ser("ich"),s.map(r=>r.ich_lo??null),s.map(r=>r.ich_hi??null),COL[0],"ICH medio");
+ $("d_colas").textContent=`Línea roja: % con ICH < ${ub} (banda IC). Verde: % con ICH ≥ ${ua}.`;
+ mk("c_colas",{type:"line",data:{labels:P,datasets:[
+  {label:"_lo",data:s.map(r=>r.pct_bajo_lo??null),borderWidth:0,pointRadius:0,fill:false},
+  {label:"_hi",data:s.map(r=>r.pct_bajo_hi??null),borderWidth:0,pointRadius:0,fill:"-1",backgroundColor:COL[1]+"33"},
+  {label:`% < ${ub}`,data:ser("pct_bajo"),borderColor:COL[1],backgroundColor:COL[1],tension:.2},
+  {label:`% ≥ ${ua}`,data:ser("pct_alto"),borderColor:COL[3],backgroundColor:COL[3],tension:.2,yAxisID:"y2"}]},
+  options:{plugins:{legend:hideBand},scales:{y:{title:{display:true,text:"% bajo"}},y2:{position:"right",grid:{drawOnChartArea:false},title:{display:true,text:"% alto"}}}}});
+ const bn=["< 2","2 a 3","3 a 4","≥ 4"],bc=["#b5443c","#d99a2b","#7fb07f","#2f7a4b"];
+ mk("c_dist",{type:"bar",data:{labels:P,datasets:bn.map((n,i)=>({label:n,data:s.map(r=>r.bandas?r.bandas[i]:null),backgroundColor:bc[i]}))},
+  options:{scales:{x:{stacked:true},y:{stacked:true,max:100}},plugins:{legend:{labels:{boxWidth:12}}}}});
+ if(df){const ks=Object.keys(df.contrib);const lab=[df.desde,...ks.map(k=>LAB[k]),"Otros / faltantes",df.hasta];
+  const vals=[],colr=[];let cum=df.ich0;const lo=Math.floor((Math.min(df.ich0,df.ich1)-.15)*10)/10;
+  vals.push([lo,df.ich0]);colr.push("#8795a5");
+  [...ks.map(k=>df.contrib[k]),df.residuo].forEach(c=>{vals.push([cum,cum+c]);colr.push(c>=0?"#3f8a55":"#b5443c");cum+=c});
+  vals.push([lo,df.ich1]);colr.push("#1f6f8b");
+  $("d_wf").textContent=`Aporte de cada dimensión a la variación del ICH (puntos), con los pesos actuales.`;
+  mk("c_wf",{type:"bar",data:{labels:lab,datasets:[{data:vals,backgroundColor:colr}]},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const v=c.raw;return v[0]==lo?fmt(v[1],3):sg(v[1]-v[0],3)}}}},scales:{y:{min:lo}}}})}}
+
+function rDims(){
+ const P=S.data.periodos,g=$("dimGrid"),dims=DIMS.slice(0,6);
+ if(!g.children.length)g.innerHTML=DIMS.map(k=>`<div class="card"><h4>${LAB[k]}</h4><div class="ch s"><canvas id="cd_${k}"></canvas></div></div>`).join("");
+ DIMS.forEach((k,i)=>{const v=S.data.serie.map(r=>r["dim_"+k]==null?null:1+4*r["dim_"+k]);
+  mk("cd_"+k,{type:"line",data:{labels:P,datasets:[{label:LAB[k],data:v,borderColor:COL[i],backgroundColor:COL[i],tension:.2,pointRadius:2}]},options:{plugins:{legend:{display:false}},scales:{y:{suggestedMin:1,suggestedMax:5}}}})});
+ const s=S.data.serie,a=s[0],b=s[s.length-1];
+ mk("c_radar",{type:"radar",data:{labels:dims.map(k=>LAB[k]),datasets:[
+  {label:a.periodo,data:dims.map(k=>1+4*a["dim_"+k]),borderColor:COL[5],backgroundColor:COL[5]+"22"},
+  {label:b.periodo,data:dims.map(k=>1+4*b["dim_"+k]),borderColor:COL[1],backgroundColor:COL[1]+"22"}]},options:{scales:{r:{min:1,max:5}}}})}
+
+function rTerr(){
+ const D=S.data,P=D.periodos,R=D.regiones,rk=Object.keys(R.nombres);
+ mk("c_reg",{type:"line",data:{labels:P,datasets:rk.map((k,i)=>({label:R.nombres[k],data:P.map(p=>R.datos[p][k]?R.datos[p][k].v:null),borderColor:COL[i],backgroundColor:COL[i],tension:.2,pointRadius:2,spanGaps:true}))},options:{interaction:{mode:"index",intersect:false}}});
+ heat($("h_reg"),rk.map(k=>({k,l:R.nombres[k]})),P,(k,p)=>R.datos[p][k]?R.datos[p][k].v:null);
+ const p=$("aglPer").value||P[P.length-1],A=D.aglomerados,ent=Object.entries(A.datos[p]||{}).map(([k,v])=>({n:A.nombres[k],v:v.v,m:v.n})).sort((a,b)=>b.v-a.v);
+ $("aglBox").style.height=Math.max(260,ent.length*20+60)+"px";
+ mk("c_agl",{type:"bar",data:{labels:ent.map(e=>e.n),datasets:[{data:ent.map(e=>e.v),backgroundColor:ent.map(e=>e.v<2.5?COL[1]:e.v<3.5?COL[2]:COL[3])}]},
+  options:{indexAxis:"y",plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:c=>"n="+ent[c.dataIndex].m+" hogares"}}},scales:{x:{suggestedMin:1,suggestedMax:5}}}})}
+
+function rIng(){
+ const D=S.data,P=D.periodos,dec=[...Array(10)].map((_,i)=>String(i+1));
+ const v=(k,p)=>D.deciles[p][k]?D.deciles[p][k].v:null;
+ heat($("h_dec"),dec.map(k=>({k,l:"D"+k})),P,v);
+ mk("c_dec",{type:"line",data:{labels:P,datasets:[["1","D1 (más pobre)",COL[1]],["5","D5",COL[2]],["10","D10 (más rico)",COL[3]]].map(([k,l,c])=>({label:l,data:P.map(p=>v(k,p)),borderColor:c,backgroundColor:c,tension:.2,spanGaps:true}))},options:{interaction:{mode:"index",intersect:false}}});
+ mk("c_gap",{type:"line",data:{labels:P,datasets:[{label:"D10 − D1",data:P.map(p=>v("10",p)!=null&&v("1",p)!=null?v("10",p)-v("1",p):null),borderColor:COL[4],backgroundColor:COL[4],tension:.2,spanGaps:true}]},options:{plugins:{legend:{display:false}}}})}
+
+function rSJ(){
+ const D=S.data,P=D.periodos,s=D.serie,T=D.tenencia;
+ if(!T.disponible){$("sjKpis").innerHTML=`<div class="note warn" style="grid-column:1/-1">Las bases cargadas no tienen la variable II7 (régimen de tenencia).</div>`;return}
+ const l=s[s.length-1];
+ $("sjKpis").innerHTML=[["Índice seguridad jurídica "+l.periodo,fmt(l.sjt_idx),"1 = precaria · 5 = propiedad plena"],["Tenencia insegura",fmt(l.pct_tenencia_insegura,1)+"%","puntaje < 0,5 en la escala de abajo"],["Doble déficit",fmt(l.pct_doble_deficit,1)+"%","tenencia insegura y ICH físico < 3"]]
+  .map(([a,b,c])=>`<div class="kpi"><div class="l">${a}</div><div class="v">${b}</div><div class="s">${c}</div></div>`).join("");
+ mk("c_sj",{type:"line",data:{labels:P,datasets:[{label:"Seguridad jurídica",data:ser("sjt_idx"),borderColor:COL[4],backgroundColor:COL[4],tension:.2}]},options:{plugins:{legend:{display:false}}}});
+ $("d_dd").textContent="Doble déficit: hogares con tenencia insegura Y calidad física baja (ICH físico < 3).";
+ mk("c_dd",{type:"line",data:{labels:P,datasets:[{label:"Tenencia insegura %",data:ser("pct_tenencia_insegura"),borderColor:COL[2],backgroundColor:COL[2],tension:.2},{label:"Doble déficit %",data:ser("pct_doble_deficit"),borderColor:COL[1],backgroundColor:COL[1],tension:.2}]}});
+ const ks=Object.keys(T.nombres);
+ mk("c_ten",{type:"bar",data:{labels:P,datasets:ks.map((k,i)=>({label:TEN[k],data:P.map(p=>T.datos[p][k].pct),backgroundColor:COL[i%COL.length]}))},options:{scales:{x:{stacked:true},y:{stacked:true,max:100}},plugins:{legend:{labels:{boxWidth:10,font:{size:10}}}}}});
+ const p=$("tenPer").value||P[P.length-1];
+ mk("c_tenich",{type:"bar",data:{labels:ks.map(k=>TEN[k]),datasets:[{data:ks.map(k=>T.datos[p][k].ich),backgroundColor:ks.map((k,i)=>COL[i%COL.length])}]},options:{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:{suggestedMin:1,suggestedMax:5}}}});
+ if(!$("sjTable").children.length)$("sjTable").innerHTML=`<table class="t">${ks.map(k=>`<tr><td>${TEN[k]}</td><td><input type="number" step="0.1" min="0" max="1" value="${S.sjt[k]}" data-k="${k}" class="sjin"></td></tr>`).join("")}</table><button id="sjReset" style="margin-top:8px">Restaurar valores</button>`;
+ document.querySelectorAll(".sjin").forEach(i=>i.onchange=()=>{S.sjt[i.dataset.k]=Math.min(1,Math.max(0,+i.value));schedule()});
+ $("sjReset").onclick=()=>{S.sjt={...SJT0};document.querySelectorAll(".sjin").forEach(i=>i.value=S.sjt[i.dataset.k]);schedule()}}
+
+function compRegiones(){const D=S.data;if(!D||!D.regiones.composicion)return`<p class="small">Cargá datos para ver qué aglomerados componen cada región.</p>`;
+ const C=D.regiones.composicion;
+ return`<table class="t"><tr><th>Región</th><th>Aglomerados (código)</th><th>Fuente</th></tr>${Object.entries(C).map(([r,v])=>`<tr><td><b>${r}</b>${r=="GBA"?`<div class="small">en los gráficos: CABA (32) y Partidos del GBA (33) por separado</div>`:""}</td><td>${v.aglomerados.map(a=>`${a.nombre} (${a.cod})`).join(" · ")}</td><td class="small">${v.origen}</td></tr>`).join("")}</table>`}
+function rMet(){$("metBox").innerHTML=`
+<h4>Cómo se calcula</h4>
+<p>Cada hogar recibe seis subíndices entre 0 y 1. El ICH es <code>1 + 4 × Σ(peso × subíndice) / Σ pesos</code>: 1 es la peor calidad posible y 5 la mejor. Los hogares con algún dato faltante en una dimensión con peso mayor a 0 se descartan (se informa el %).</p>
+<table class="t"><tr><th>Dimensión</th><th>Variables EPH</th><th>Regla</th></tr>
+<tr><td>Materiales</td><td>IV3, IV4, IV5</td><td>Promedio de piso (1→1, 2→.5, 3→0, 4→.5), techo (1,3,9→1; 2→.75; 4,5→.5; 6,7→0) y cielorraso (sí→1, no→0)</td></tr>
+<tr><td>Agua</td><td>IV6, IV7</td><td>Ubicación (1→1, 2→.5, 3→0) y origen (1→1, 2→.5, 3→.25, 4→0), promedio</td></tr>
+<tr><td>Saneamiento</td><td>IV8–IV11, II9</td><td>Sin baño → 0. Si no: 20% ubicación, 30% inodoro, 30% desagüe (1→1, 2→.6, 3→.3, 4→0), 20% uso exclusivo (1→1, 2→.5, 3→.25, 4→0)</td></tr>
+<tr><td>Hacinamiento</td><td>IX_Tot, II1</td><td>max(0, min(1, (3 − personas por ambiente)/2)). Con 3 o más personas por cuarto el puntaje es 0</td></tr>
+<tr><td>Energía de cocción</td><td>II8</td><td>Gas de red→1, tubo/garrafa→.5, kerosene/leña/carbón u otro→0</td></tr>
+<tr><td>Entorno</td><td>IV12_1–3</td><td>1 − (cantidad de «sí» a basural, zona inundable, villa)/3</td></tr>
+<tr><td>Seguridad jurídica</td><td>II7</td><td>Convención editable (pestaña propia). Peso 0 por defecto</td></tr></table>
+<h4 style="margin-top:14px">Regiones y aglomerados</h4>${compRegiones()}
+<h4 style="margin-top:14px">Qué tener presente</h4>
+<ul>
+<li><b>Los pesos y puntajes son normativos.</b> Probá esquemas distintos con los sliders: si la conclusión se invierte, depende de los pesos y no de los datos.</li>
+<li><b>Intervalos:</b> bootstrap por vivienda (CODUSU). La base pública no trae el área de muestreo, así que la banda es un piso del error real.</li>
+<li><b>Comparabilidad:</b> verificá que los códigos no hayan cambiado entre años y revisá la continuidad de la serie (interrupciones metodológicas, pandemia).</li>
+<li><b>Cobertura:</b> la EPH solo releva aglomerados urbanos.</li>
+<li><b>Ponderación:</b> por defecto PONDERA × IX_Tot (personas). Se puede cambiar a hogares.</li></ul>`}
+
+$("csv").onclick=()=>{if(!S.data)return;const s=S.data.serie;const ks=["periodo","n","ich","ich_lo","ich_hi","pct_bajo","pct_alto","sjt_idx","pct_tenencia_insegura","pct_doble_deficit",...DIMS.map(k=>"dim_"+k)];
+ const csv=[ks.join(","),...s.map(r=>ks.map(k=>r[k]??"").join(","))].join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="ich_serie.csv";a.click()};
+
+/* ---------- init ---------- */
+(async()=>{go("carga");const r=await post("/api/estado");setLoaded(r);if(S.loaded.length){await compute();if(S.data)go("resumen")}})();
+</script>
+</body>
+</html>
