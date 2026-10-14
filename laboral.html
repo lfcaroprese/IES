@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mercado laboral · EPH</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#1c2733;--mut:#667587;--line:#e1e6ec;--pri:#1f6f8b;--red:#b5443c;--amb:#d99a2b;--grn:#3f8a55}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#12303c;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:650}header .sub{color:#a9c3cf;font-size:12.5px}
+header a{margin-left:auto;color:#fff;text-decoration:none;border:1px solid #4d7686;border-radius:7px;padding:4px 10px;font-size:13px}
+#demoBanner{display:none;background:#fff3cd;color:#664d03;border-bottom:1px solid #ecd48a;padding:7px 20px;font-size:13px}
+.wrap{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;padding:16px;max-width:1550px;margin:0 auto}
+aside{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;align-self:start;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+aside h3{margin:14px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}aside h3:first-child{margin-top:0}
+button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 10px;cursor:pointer;color:var(--ink)}button:hover{border-color:var(--pri)}
+select,input[type=number],input[type=text],input[type=search]{font:inherit;border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:#fff}
+input[type=number]{width:80px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.agl{border:1px solid var(--line);border-radius:7px;max-height:230px;overflow:auto;padding:4px 8px;margin-top:6px}
+.agl label{display:flex;gap:6px;align-items:center;padding:1px 0;font-size:13px}
+.small{font-size:12px;color:var(--mut)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.tab{padding:7px 12px;border-radius:8px;border:1px solid transparent;cursor:pointer;color:var(--mut)}
+.tab.on{background:var(--card);border-color:var(--line);color:var(--ink);font-weight:600}
+section.page{display:none}section.page.on{display:block}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px;overflow-x:auto}
+.card h4{margin:0 0 2px;font-size:14px}.card .d{color:var(--mut);font-size:12px;margin-bottom:8px}
+.ch{position:relative;height:300px}.ch.s{height:200px}
+.note{border-left:4px solid var(--pri);background:#eef6f9;padding:10px 12px;border-radius:6px;margin-bottom:14px}
+.note.warn{border-color:var(--amb);background:#fff8e6}
+table.t{border-collapse:collapse;width:100%}table.t td,table.t th{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+table.t td.n,table.t th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.t tr.sec td{background:#f0f4f7;font-weight:600;color:var(--mut);font-size:12px}
+.ci{color:var(--mut);font-size:11.5px}
+table.heat{border-collapse:collapse;width:100%;font-size:12px}table.heat th{font-weight:600;color:var(--mut);padding:3px 5px;text-align:center}
+table.heat th.rl{text-align:left;white-space:nowrap}table.heat td{padding:4px;text-align:center;border:1px solid #fff;font-variant-numeric:tabular-nums}
+.drop{border:2px dashed #b8c4d0;border-radius:10px;padding:24px;text-align:center;background:#fafbfc}.drop.hov{border-color:var(--pri);background:#eef6f9}
+.ok{color:var(--grn)}.err{color:var(--red)}.good{color:var(--grn)}.bad{color:var(--red)}
+#busy{position:fixed;right:16px;bottom:16px;background:#12303c;color:#fff;padding:6px 12px;border-radius:8px;display:none;font-size:12px}
+.scroll{overflow:auto;max-height:520px}
+code{background:#eef1f4;padding:1px 5px;border-radius:4px}
+@media(max-width:1000px){.wrap{grid-template-columns:1fr}aside{position:static;max-height:none}.g2,.g3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>Mercado laboral · EPH</h1><span class="sub">Base Personas · actividad, empleo, desocupación y subocupación</span><a href="index.html">← Calidad habitacional</a></header>
+<div id="demoBanner"><b>Datos sintéticos de ejemplo.</b> Sirven para ver el funcionamiento; no reflejan la realidad. Cargá la base Personas real en «Carga».</div>
+<div class="wrap">
+<aside>
+  <h3>Aglomerados</h3>
+  <input type="search" id="aglQ" placeholder="Buscar aglomerado…" style="width:100%">
+  <div class="row" style="margin-top:6px"><button id="aglAll">Todos</button><button id="aglNone">Ninguno</button><span class="small" id="aglCount"></span></div>
+  <div class="agl" id="aglList"></div>
+  <div class="row" style="margin-top:6px"><label><input type="checkbox" id="separado"> Ver cada uno por separado</label></div>
+  <div class="small">Sin selección: solo se muestra el total de los 31. Con selección: se agrega al total una serie «Selección» (suma de los elegidos).</div>
+  <h3>Serie y período</h3>
+  <div class="row"><span>Serie</span><select id="agreg"><option value="anio">promedio anual</option><option value="trimestre">por trimestre</option></select></div>
+  <div class="row"><span>Trimestres</span>
+    <label><input type="checkbox" class="tr" value="1" checked>1</label><label><input type="checkbox" class="tr" value="2">2</label>
+    <label><input type="checkbox" class="tr" value="3">3</label><label><input type="checkbox" class="tr" value="4">4</label></div>
+  <div class="row"><span>Comparar contra</span><select id="base"><option value="yoy">mismo período año anterior</option><option value="first">primer período</option></select></div>
+  <h3>Parámetros</h3>
+  <div class="row"><span>Desocupación de pleno empleo u*</span><input type="number" id="ustar" value="5" step="0.5" min="0" max="20">%</div>
+  <div class="row"><label><input type="checkbox" id="desmDisp"> Desmotivados: exigir disponibilidad (PP02A = 1 o 2)</label></div>
+  <div class="row"><label><input type="checkbox" id="boot" checked> Intervalos de confianza (bootstrap)</label></div>
+  <h3>Grupo en foco</h3>
+  <select id="foco" style="width:100%"></select>
+  <div class="small">Pestañas Interanual, Desmotivados, Empleo pleno y Formalidad se muestran para este grupo.</div>
+</aside>
+<main>
+  <div class="tabs" id="tabs"></div>
+
+  <section class="page" id="p-carga">
+    <div class="card"><h4>Cargar base Personas (usu_individual)</h4>
+      <div class="d">.txt, .csv o .xlsx. Podés subir varios trimestres/años juntos; el período sale de ANO4 y TRIMESTRE. Se procesan en tu navegador: nada se envía a ningún servidor. Columnas requeridas: CODUSU, ANO4, TRIMESTRE, AGLOMERADO, PONDERA, ESTADO, INTENSI, PP03J. Opcionales: EMPLEO, PP02E, PP02A.</div>
+      <div class="drop" id="drop"><p><b>Arrastrá los archivos acá</b> o</p><input type="file" id="file" multiple accept=".txt,.csv,.xlsx,.xls"></div>
+      <div class="row" style="margin-top:10px"><button id="demoBtn">Cargar datos de ejemplo (sintéticos)</button><button id="clearBtn">Vaciar datos</button></div>
+      <div id="msgs" style="margin-top:10px"></div><div id="saveNote" style="margin-top:6px"></div></div>
+    <div class="card"><h4>Períodos cargados</h4><div id="loaded" class="small">Todavía no hay datos.</div></div>
+  </section>
+
+  <section class="page" id="p-tasas">
+    <div class="row"><span>Período</span><select id="perT"></select></div>
+    <div class="card"><h4>Tasas (%)</h4><div class="d">Valor [IC 95% bootstrap por vivienda]. Actividad y empleo sobre población total; desocupación y subocupación sobre la PEA.</div><div id="tTasas"></div></div>
+    <div class="card"><h4>Niveles (miles de personas)</h4><div id="tNiv"></div></div>
+    <div class="card"><h4>Verificación de identidad</h4><div class="d">empleo = actividad × (1 − desocupación) y subocupación = demandante + no demandante</div><div id="tIdent"></div></div>
+  </section>
+
+  <section class="page" id="p-evol">
+    <div class="row"><span>Indicador</span><select id="mEvol"></select></div>
+    <div class="card"><h4 id="hEvol"></h4><div class="d" id="dEvol"></div><div class="ch"><canvas id="c_evol"></canvas></div></div>
+    <div class="grid g3" id="miniGrid"></div>
+  </section>
+
+  <section class="page" id="p-yoy">
+    <div class="note" id="yoyNote"></div>
+    <div class="row"><span>Período</span><select id="perY"></select></div>
+    <div class="grid g2">
+      <div class="card"><h4>Variación en puntos porcentuales</h4><div class="d">Tasas básicas, todos los grupos del panel. Un punto porcentual = 1 pp.</div><div class="ch"><canvas id="c_yoy"></canvas></div></div>
+      <div class="card"><h4>Mapa de variaciones (grupo en foco)</h4><div class="d">Verde/rojo: el IC 95% no incluye 0. Gris: no se distingue del ruido muestral.</div><div id="h_yoy"></div></div>
+    </div>
+    <div class="card"><h4>Detalle de variaciones</h4><div id="tYoy"></div></div>
+  </section>
+
+  <section class="page" id="p-desm">
+    <div class="note warn"><b>Desmotivados:</b> inactivos (ESTADO=3) que no buscaron trabajo porque «se cansaron de buscar» (PP02E=3). Quedan fuera de la PEA aunque quieran trabajar. La <b>PEA ampliada</b> los suma. El <b>contrafactual</b> responde: si la tasa de desmotivados se hubiera mantenido en el nivel del período base y esas personas hubieran figurado como desocupadas, ¿cuánto serían la actividad y la desocupación? Es una simulación con ese supuesto, no una medición.</div>
+    <div id="desmMissing"></div>
+    <div class="grid g2">
+      <div class="card"><h4>Actividad: oficial vs ampliada</h4><div class="ch"><canvas id="c_dact"></canvas></div></div>
+      <div class="card"><h4>Desocupación: oficial vs ampliada</h4><div class="ch"><canvas id="c_ddes"></canvas></div></div>
+      <div class="card"><h4>Desmotivados (% de la población)</h4><div class="ch"><canvas id="c_dpob"></canvas></div></div>
+      <div class="card"><h4>Desocupación observada vs contrafactual</h4><div class="d" id="d_cf"></div><div class="ch"><canvas id="c_dcf"></canvas></div></div>
+    </div>
+    <div class="card"><h4>Variación atribuible a los desmotivados (grupo en foco)</h4><div id="tDesm"></div></div>
+  </section>
+
+  <section class="page" id="p-pleno">
+    <div class="note">Dos lecturas del «empleo base»: (1) la composición de los ocupados por intensidad horaria (INTENSI), donde <b>ocupado pleno</b> = 35 a 45 horas aprox.; (2) el <b>empleo a pleno empleo</b>: la tasa de empleo que habría con la actividad observada si la desocupación fuera u* (parámetro del panel). La brecha es lo que falta para llegar ahí.</div>
+    <div class="grid g2">
+      <div class="card"><h4>Composición de los ocupados por intensidad (%)</h4><div class="ch"><canvas id="c_comp"></canvas></div></div>
+      <div class="card"><h4>Empleo observado vs empleo a pleno empleo</h4><div class="d" id="d_pl"></div><div class="ch"><canvas id="c_pl"></canvas></div></div>
+      <div class="card"><h4>Brecha de empleo (pp de la población)</h4><div class="ch"><canvas id="c_br"></canvas></div></div>
+      <div class="card"><h4>Brecha de empleo (miles de puestos)</h4><div class="d">Con PEA oficial y con PEA ampliada (suma los desmotivados).</div><div class="ch"><canvas id="c_brm"></canvas></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-form">
+    <div id="formMissing"></div>
+    <div class="grid g2">
+      <div class="card"><h4>Informalidad (% de los ocupados)</h4><div class="d">EMPLEO = 2 sobre ocupados con dato válido. Todos los grupos del panel.</div><div class="ch"><canvas id="c_inf"></canvas></div></div>
+      <div class="card"><h4>Empleo formal e informal (% de la población)</h4><div class="d">Grupo en foco.</div><div class="ch"><canvas id="c_fi"></canvas></div></div>
+    </div>
+    <div class="card"><h4>Formales e informales: niveles (miles)</h4><div class="ch s"><canvas id="c_fin"></canvas></div></div>
+  </section>
+
+  <section class="page" id="p-terr">
+    <div class="row"><span>Indicador</span><select id="mTerr"></select><span>Período</span><select id="perR"></select></div>
+    <div class="card"><h4 id="hTerr"></h4><div class="d">Azul: aglomerados seleccionados. Gris: resto. La línea punteada es el total de los 31.</div><div class="ch" id="rankBox" style="height:720px"><canvas id="c_rank"></canvas></div></div>
+    <div class="card"><h4>Aglomerado × período</h4><div class="scroll" id="h_terr"></div></div>
+    <div class="card"><h4>Niveles por aglomerado (miles) en el período elegido</h4><div class="d">Para controlar contra el cuadro 3.2 de INDEC (población, PEA, ocupados, desocupados, subocupados). «Casos» = personas en la muestra.</div><div class="scroll" id="tLev"></div></div>
+  </section>
+
+  <section class="page" id="p-ctrl">
+    <div class="card"><h4>1 · Cuadros de INDEC (vista previa)</h4>
+      <div class="d">Subí <code>cuadros_tasas_indicadores_eph_06_26.xls</code> para ver las hojas 1.1 y 3.2 y copiar los valores de referencia.</div>
+      <input type="file" id="xls" accept=".xls,.xlsx"><div id="xlsOut" style="margin-top:10px"></div></div>
+    <div class="card"><h4>2 · Control del total contra el cuadro 1.1</h4>
+      <div class="d">Cargá los valores de INDEC y se comparan con el total de 31 aglomerados del período elegido. INDEC publica con 1 decimal: tolerancia ±0,05 pp (tasas) y ±0,5 mil (niveles).</div>
+      <div class="row"><span>Período</span><select id="perC"></select></div>
+      <div id="ctrlForm"></div></div>
+    <div class="card"><h4>3 · Control del aglomerado contra el cuadro 3.2</h4>
+      <div class="d">Elegí el aglomerado y cargá sus niveles de INDEC (miles).</div>
+      <div class="row"><span>Aglomerado</span><select id="aglC"></select></div><div id="ctrlAgl"></div></div>
+  </section>
+
+  <section class="page" id="p-met"><div class="card" id="metBox"></div></section>
+</main>
+</div>
+<div id="busy">Calculando…</div>
+<script src="vendor/chart.umd.js"></script>
+<script src="js/api.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const COL=["#334155","#1f6f8b","#b5443c","#d99a2b","#3f8a55","#7a5ea8","#c2577e","#8a6d3b","#4f9da6","#6b7280"];
+const M={act:["Tasa de actividad","PEA / población total"],emp:["Tasa de empleo","ocupados / población total"],des:["Tasa de desocupación","desocupados / PEA"],
+ sub:["Subocupación (total)","subocupados / PEA"],subdem:["Subocupación demandante","subocupados que buscan otro empleo (PP03J=1) / PEA"],subnodem:["Subocupación no demandante","(subocupados − demandantes) / PEA"],
+ sub_ocu:["Subocupados (% de ocupados)",""],plen_ocu:["Ocupados plenos (% de ocupados)","INTENSI=2"],sobre_ocu:["Sobreocupados (% de ocupados)","INTENSI=3"],notrab_ocu:["Ocupados que no trabajaron (% de ocupados)","INTENSI=4"],
+ informal_ocu:["Tasa de informalidad (% de ocupados)","EMPLEO=2"],emp_formal:["Empleo formal (% de la población)",""],emp_informal:["Empleo informal (% de la población)",""],
+ desm_pob:["Desmotivados (% de la población)","ESTADO=3 y PP02E=3"],desm_inact:["Desmotivados (% de los inactivos)",""],act_amp:["Actividad ampliada (PEA + desmotivados)",""],des_amp:["Desocupación ampliada",""],
+ emp_pleno:["Empleo a pleno empleo (u*)","actividad × (1 − u*)"],brecha_emp:["Brecha de empleo (pp)","empleo a pleno empleo − empleo observado"],emp_pleno_amp:["Empleo a pleno empleo con PEA ampliada",""],brecha_emp_amp:["Brecha de empleo con PEA ampliada (pp)",""]};
+const CORE=["act","emp","des","sub","subdem","subnodem"];
+const S={sel:new Set(),data:null,charts:{},loaded:[],aglos:{},tab:"carga"};
+const f1=x=>x==null?"–":x.toFixed(1),f2=x=>x==null?"–":x.toFixed(2),sg=(x,d=2)=>x==null?"–":(x>=0?"+":"")+x.toFixed(d);
+const mi=x=>x==null?"–":Math.round(x).toLocaleString("es-AR");
+
+/* ---------- tabs ---------- */
+const TABS=[["carga","Carga"],["tasas","Tasas"],["evol","Evolución"],["yoy","Interanual"],["desm","Desmotivados"],["pleno","Empleo pleno"],["form","Formal / informal"],["terr","Territorio"],["ctrl","Controles"],["met","Metodología"]];
+$("tabs").innerHTML=TABS.map(([k,l])=>`<div class="tab" data-t="${k}">${l}</div>`).join("");
+$("tabs").onclick=e=>{if(e.target.dataset.t)go(e.target.dataset.t)};
+function go(t){S.tab=t;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.t==t));
+ document.querySelectorAll("section.page").forEach(x=>x.classList.toggle("on",x.id=="p-"+t));render()}
+
+/* ---------- aglomerados ---------- */
+function drawAgl(){const q=$("aglQ").value.toLowerCase();
+ const ents=Object.entries(S.aglos).sort((a,b)=>a[1].localeCompare(b[1],"es")).filter(([c,n])=>n.toLowerCase().includes(q));
+ $("aglList").innerHTML=ents.map(([c,n])=>`<label><input type="checkbox" data-c="${c}" ${S.sel.has(+c)?"checked":""}>${n} <span class="small">(${c})</span></label>`).join("");
+ $("aglCount").textContent=S.sel.size?`${S.sel.size} elegido(s)`:"ninguno (solo total)"}
+$("aglQ").oninput=drawAgl;
+$("aglList").onchange=e=>{const c=+e.target.dataset.c;e.target.checked?S.sel.add(c):S.sel.delete(c);$("aglCount").textContent=S.sel.size?`${S.sel.size} elegido(s)`:"ninguno (solo total)";schedule()};
+$("aglAll").onclick=()=>{Object.keys(S.aglos).forEach(c=>S.sel.add(+c));drawAgl();schedule()};
+$("aglNone").onclick=()=>{S.sel.clear();drawAgl();schedule()};
+["separado","agreg","base","ustar","desmDisp","boot"].forEach(id=>$(id).onchange=schedule);
+document.querySelectorAll(".tr").forEach(c=>c.onchange=schedule);
+$("foco").onchange=render;
+
+/* ---------- API ---------- */
+let timer;function schedule(){clearTimeout(timer);timer=setTimeout(compute,350)}
+const post=(url,body)=>API.post(url,body);
+API.onProgress=t=>{$("busy").textContent=t};
+async function compute(){
+ if(!S.loaded.length)return;
+ const trimestres=[...document.querySelectorAll(".tr:checked")].map(c=>+c.value);
+ $("busy").textContent="Calculando…";$("busy").style.display="block";
+ const r=await post("/api/lab/compute",{trimestres,agregacion:$("agreg").value,aglos:[...S.sel],separado:$("separado").checked,base:$("base").value,ustar:+$("ustar").value,boot:$("boot").checked?200:0,desm_disp:$("desmDisp").checked});
+ $("busy").style.display="none";
+ if(r.error){alert(r.error);return}
+ S.data=r;fillSelects();render()}
+function setLoaded(r){S.loaded=r.periodos||[];$("demoBanner").style.display=r.demo?"block":"none";
+ $("saveNote").innerHTML=(r.avisos||[]).map(a=>`<div class="err">${a}</div>`).join("")+(r.guardado?`<div class="ok">✓ Las bases quedan guardadas en este navegador: al recargar o actualizar la web no hace falta volver a subirlas.</div>`:(r.demo||!S.loaded.length?"":`<div class="small">Estos datos no se guardan en este navegador.</div>`));
+ $("loaded").innerHTML=S.loaded.length?`<table class="t"><tr><th>Período</th><th class="n">Personas</th></tr>${S.loaded.map(p=>`<tr><td>${p.periodo}</td><td class="n">${p.personas.toLocaleString("es-AR")}</td></tr>`).join("")}</table>`:"Todavía no hay datos."}
+async function upload(files){
+ $("busy").textContent="Procesando archivos…";$("busy").style.display="block";
+ const r=await API.upload("/api/lab/upload",files);$("busy").style.display="none";
+ $("msgs").innerHTML=r.archivos.map(a=>`<div class="${a.ok?"ok":"err"}">${a.ok?"✓":"✗"} ${a.archivo}: ${a.msg}</div>`).join("");
+ setLoaded(r);if(S.loaded.length){await compute();if(S.data)go("tasas")}}
+$("file").onchange=e=>upload(e.target.files);
+const dz=$("drop");["dragover","dragenter"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("hov")}));
+["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("hov")}));
+dz.addEventListener("drop",e=>upload(e.dataTransfer.files));
+$("demoBtn").onclick=async()=>{$("busy").style.display="block";const r=await post("/api/lab/demo");setLoaded(r);await compute();if(S.data)go("tasas")};
+$("clearBtn").onclick=async()=>{if(!confirm("Se borran los datos cargados, incluidos los guardados en este navegador. ¿Seguir?"))return;const r=await post("/api/lab/reset");setLoaded(r);S.data=null;$("msgs").innerHTML="";go("carga")};
+
+function fillSelects(){const D=S.data,P=D.periodos;
+ const keep=(id,opts,def)=>{const el=$(id),cur=el.value;el.innerHTML=opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join("");el.value=opts.some(o=>o[0]==cur)?cur:def};
+ const po=P.map(p=>[p,p]),last=P[P.length-1];
+ ["perT","perY","perR","perC"].forEach(id=>keep(id,po,last));
+ keep("foco",D.grupos.map(g=>[g.id,g.label]),D.grupos[D.grupos.length>1?1:0].id);
+ const b=$("base"),cur=b.value;b.innerHTML=`<option value="yoy">mismo período año anterior</option><option value="first">primer período</option>`+P.map(p=>`<option value="${p}">${p}</option>`).join("");b.value=[...b.options].some(o=>o.value==cur)?cur:"yoy";
+ keep("mEvol",Object.keys(M).map(k=>[k,M[k][0]]),$("mEvol").value||"des");keep("mTerr",Object.keys(M).map(k=>[k,M[k][0]]),$("mTerr").value||"des");
+ const ac=$("aglC"),c0=ac.value;ac.innerHTML=Object.entries(S.aglos).sort((a,b)=>a[1].localeCompare(b[1],"es")).map(([c,n])=>`<option value="${c}">${n}</option>`).join("");ac.value=c0||[...S.sel][0]||"13";
+ ["perT","perY","perR","perC","mEvol","mTerr","aglC"].forEach(id=>$(id).onchange=render)}
+
+/* ---------- helpers ---------- */
+function mk(id,cfg){if(S.charts[id])S.charts[id].destroy();const el=$(id);if(!el)return;
+ cfg.options=Object.assign({responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:"index",intersect:false}},cfg.options||{});S.charts[id]=new Chart(el,cfg)}
+const hide={labels:{filter:i=>!i.text.startsWith("_"),boxWidth:12}};
+const gcol=i=>COL[i%COL.length];
+function lines(id,P,defs,opts={}){ // defs: [{label,data,color,lo,hi,dash,fill}]
+ const ds=[];defs.forEach(d=>{if(d.lo&&d.lo.some(v=>v!=null)){ds.push({label:"_lo",data:d.lo,borderWidth:0,pointRadius:0,fill:false});ds.push({label:"_hi",data:d.hi,borderWidth:0,pointRadius:0,fill:"-1",backgroundColor:d.color+"26"})}
+  ds.push({label:d.label,data:d.data,borderColor:d.color,backgroundColor:d.color,tension:.2,pointRadius:2.5,spanGaps:true,borderDash:d.dash||[]})});
+ mk(id,{type:"line",data:{labels:P,datasets:ds},options:Object.assign({plugins:{legend:hide}},opts)})}
+const grp=()=>S.data.grupos;
+const focoId=()=>$("foco").value||"total";
+function heat(el,rows,cols,val,fmtf=f1,colorf=null){
+ const vs=[];rows.forEach(r=>cols.forEach(c=>{const v=val(r.k,c);if(v!=null)vs.push(v)}));const mn=Math.min(...vs),mx=Math.max(...vs);
+ const col=v=>{if(colorf)return colorf(v);const t=mx>mn?(v-mn)/(mx-mn):.5;const a=[63,138,85],b=[241,196,15],c=[181,68,60];const m=t<.5?[a,b,t*2]:[b,c,(t-.5)*2];return`rgb(${m[0].map((x,i)=>Math.round(x+(m[1][i]-x)*m[2]))})`};
+ el.innerHTML=`<table class="heat"><tr><th></th>${cols.map(c=>`<th>${c}</th>`).join("")}</tr>${rows.map(r=>`<tr><th class="rl">${r.l}</th>${cols.map(c=>{const v=val(r.k,c);return v==null?`<td style="background:#eee">·</td>`:`<td style="background:${col(v)};color:#111">${fmtf(v)}</td>`}).join("")}</tr>`).join("")}</table>`}
+const pi=l=>S.data.periodos.indexOf(l);
+
+/* ---------- render ---------- */
+function render(){if(!S.data)return;({tasas:rTasas,evol:rEvol,yoy:rYoy,desm:rDesm,pleno:rPleno,form:rForm,terr:rTerr,ctrl:rCtrl,met:rMet}[S.tab]||(()=>{}))()}
+const V=(g,k,i)=>S.data.series[g][k][i];
+const CI=(g,k,i)=>{const c=S.data.ci[g][k];return c.lo[i]==null?"":` <span class="ci">[${f1(c.lo[i])}–${f1(c.hi[i])}]</span>`};
+
+function rTasas(){const D=S.data,i=pi($("perT").value);
+ const gs=D.grupos;
+ const row=k=>`<tr><td>${M[k][0]}<div class="small">${M[k][1]}</div></td>${gs.map(g=>`<td class="n">${f1(V(g.id,k,i))}${CI(g.id,k,i)}</td>`).join("")}</tr>`;
+ $("tTasas").innerHTML=`<table class="t"><tr><th>Indicador</th>${gs.map(g=>`<th class="n">${g.label}</th>`).join("")}</tr>${CORE.map(row).join("")}</table>`;
+ const L=[["pob","Población total"],["pea","PEA"],["ocu","Ocupados"],["des","Desocupados"],["sub","Subocupados"],["subdem","  Subocupados demandantes"],["subnodem","  Subocupados no demandantes"],["inact","Inactivos"]];
+ $("tNiv").innerHTML=`<table class="t"><tr><th>Nivel (miles)</th>${gs.map(g=>`<th class="n">${g.label}</th>`).join("")}</tr>${L.map(([k,l])=>`<tr><td>${l}</td>${gs.map(g=>`<td class="n">${mi(D.niveles[g.id][k][i])}</td>`).join("")}</tr>`).join("")}<tr class="sec"><td>Casos en la muestra (personas)</td>${gs.map(g=>`<td class="n">${D.casos[g.id][i].toLocaleString("es-AR")}</td>`).join("")}</tr></table>`;
+ $("tIdent").innerHTML=`<table class="t"><tr><th>Grupo</th><th class="n">actividad × (1 − desocupación)</th><th class="n">empleo</th><th class="n">diferencia</th><th class="n">demandante + no demandante</th><th class="n">subocupación</th><th class="n">diferencia</th></tr>${gs.map(g=>{const a=V(g.id,"act",i),d=V(g.id,"des",i),e=V(g.id,"emp",i),s=V(g.id,"sub",i),sd=V(g.id,"subdem",i),sn=V(g.id,"subnodem",i);
+  return a==null?"":`<tr><td>${g.label}</td><td class="n">${(a*(1-d/100)).toFixed(4)}</td><td class="n">${e.toFixed(4)}</td><td class="n ok">${(a*(1-d/100)-e).toExponential(1)}</td><td class="n">${(sd+sn).toFixed(4)}</td><td class="n">${s.toFixed(4)}</td><td class="n ok">${(sd+sn-s).toExponential(1)}</td></tr>`}).join("")}</table>`}
+
+function rEvol(){const D=S.data,P=D.periodos,k=$("mEvol").value;
+ $("hEvol").textContent=M[k][0];$("dEvol").textContent=M[k][1]+(D.grupos.length<=2?" · banda: IC 95%":"");
+ lines("c_evol",P,D.grupos.map((g,j)=>({label:g.label,data:D.series[g.id][k],color:gcol(j),lo:D.grupos.length<=2?D.ci[g.id][k].lo:null,hi:D.ci[g.id][k].hi})));
+ if(!$("miniGrid").children.length)$("miniGrid").innerHTML=CORE.map(c=>`<div class="card"><h4>${M[c][0]}</h4><div class="ch s"><canvas id="m_${c}"></canvas></div></div>`).join("");
+ CORE.forEach(c=>lines("m_"+c,P,D.grupos.slice(0,Math.min(3,D.grupos.length)).map((g,j)=>({label:g.label,data:D.series[g.id][c],color:gcol(j)}))))}
+
+function rYoy(){const D=S.data,P=D.periodos,i=pi($("perY").value),f=focoId(),gl=D.grupos.find(g=>g.id==f).label;
+ const b=D.yoy[f].act.base[i];
+ $("yoyNote").innerHTML=b?`Variación de <b>${P[i]}</b> contra <b>${b}</b>, grupo en foco: <b>${gl}</b>. Los intervalos tratan ambos períodos como muestras independientes: son conservadores (el panel repite hogares y eso achicaría el error real).`:`No hay período base para ${P[i]} con la opción elegida (por ejemplo, es el primero de la serie).`;
+ mk("c_yoy",{type:"bar",data:{labels:CORE.map(c=>M[c][0]),datasets:D.grupos.map((g,j)=>({label:g.label,data:CORE.map(c=>D.yoy[g.id][c].dif[i]),backgroundColor:gcol(j)}))},options:{plugins:{legend:{labels:{boxWidth:12}}},scales:{y:{title:{display:true,text:"pp"}}}}});
+ const keys=Object.keys(M).filter(k=>D.yoy[f][k]);
+ const sigcol=(dif,lo,hi)=>lo==null?"#eee":(lo>0?"#cfe8d4":hi<0?"#f3d2cf":"#eceff2");
+ const cells=P.map((p,j)=>p);
+ $("h_yoy").innerHTML=`<table class="heat"><tr><th></th>${P.map(p=>`<th>${p}</th>`).join("")}</tr>${CORE.map(c=>`<tr><th class="rl">${M[c][0]}</th>${P.map((p,j)=>{const y=D.yoy[f][c];const v=y.dif[j];return v==null?`<td style="background:#eee">·</td>`:`<td style="background:${sigcol(v,y.lo[j],y.hi[j])}">${sg(v,2)}</td>`}).join("")}</tr>`).join("")}</table>`;
+ $("tYoy").innerHTML=`<table class="t"><tr><th>Indicador</th><th class="n">${b||"base"}</th><th class="n">${P[i]}</th><th class="n">Δ pp</th><th class="n">IC 95% de Δ</th><th>¿Distinguible del ruido?</th></tr>${keys.map(k=>{const y=D.yoy[f][k],d=y.dif[i];const cur=V(f,k,i);const bs=d==null||cur==null?null:cur-d;
+  const sig=y.lo[i]==null?"sin IC":(y.lo[i]>0||y.hi[i]<0)?`<b class="${(y.lo[i]>0)==(k=="des"||k.startsWith("sub")||k=="informal_ocu"||k.startsWith("desm")||k.startsWith("brecha")?false:true)?"good":"bad"}">sí</b>`:"no";
+  return`<tr><td>${M[k][0]}</td><td class="n">${f2(bs)}</td><td class="n">${f2(cur)}</td><td class="n">${sg(d)}</td><td class="n">${y.lo[i]==null?"–":`[${sg(y.lo[i])} ; ${sg(y.hi[i])}]`}</td><td>${sig}</td></tr>`}).join("")}</table>`}
+
+function rDesm(){const D=S.data,P=D.periodos,f=focoId();
+ $("desmMissing").innerHTML=D.tiene_desm?"":`<div class="note warn">La base cargada no trae PP02E: no se pueden calcular desmotivados.</div>`;
+ const g=D.grupos.map((x,j)=>({...x,j}));
+ lines("c_dact",P,D.grupos.flatMap((x,j)=>[{label:x.label+" · oficial",data:D.series[x.id].act,color:gcol(j)},{label:x.label+" · ampliada",data:D.series[x.id].act_amp,color:gcol(j),dash:[5,4]}]).slice(0,6));
+ lines("c_ddes",P,D.grupos.flatMap((x,j)=>[{label:x.label+" · oficial",data:D.series[x.id].des,color:gcol(j)},{label:x.label+" · ampliada",data:D.series[x.id].des_amp,color:gcol(j),dash:[5,4]}]).slice(0,6));
+ lines("c_dpob",P,D.grupos.map((x,j)=>({label:x.label,data:D.series[x.id].desm_pob,color:gcol(j)})));
+ const c=D.cf[f];
+ $("d_cf").textContent="Línea sólida: desocupación observada. Punteada: si los desmotivados adicionales respecto del período base hubieran contado como desocupados.";
+ lines("c_dcf",P,[{label:"Desocupación observada",data:D.series[f].des,color:COL[1]},{label:"Contrafactual",data:c.des_cf,color:COL[2],dash:[5,4],lo:c.des_cf_lo,hi:c.des_cf_hi}]);
+ $("tDesm").innerHTML=`<table class="t"><tr><th>Período</th><th class="n">Base</th><th class="n">Δ desmotivados (pp pob.)</th><th class="n">Δ PEA atribuible (miles)</th><th class="n">Actividad observada</th><th class="n">Actividad contrafactual</th><th class="n">Desocupación observada</th><th class="n">Desocupación contrafactual</th></tr>${P.map((p,i)=>c.dd[i]==null?"":`<tr><td>${p}</td><td class="n">${D.yoy[f].act.base[i]||""}</td><td class="n">${sg(c.dd[i])}${c.dd_lo[i]==null?"":` <span class="ci">[${sg(c.dd_lo[i])};${sg(c.dd_hi[i])}]</span>`}</td><td class="n">${sg(c.pea_desm_miles[i],0)}</td><td class="n">${f1(V(f,"act",i))}</td><td class="n">${f1(c.act_cf[i])}</td><td class="n">${f1(V(f,"des",i))}</td><td class="n">${f1(c.des_cf[i])}</td></tr>`).join("")}</table><div class="small" style="margin-top:6px">Δ PEA atribuible = cambio de la tasa de desmotivados × población. Positivo: más personas que dejaron de buscar (y por eso no cuentan en la PEA).</div>`}
+
+function rPleno(){const D=S.data,P=D.periodos,f=focoId(),pobm=D.niveles[f].pob;
+ const ks=[["sub_ocu","Subocupados","#b5443c"],["plen_ocu","Ocupados plenos","#3f8a55"],["sobre_ocu","Sobreocupados","#d99a2b"],["notrab_ocu","No trabajaron la semana","#9aa5b1"]];
+ mk("c_comp",{type:"bar",data:{labels:P,datasets:ks.map(([k,l,c])=>({label:l,data:D.series[f][k],backgroundColor:c}))},options:{scales:{x:{stacked:true},y:{stacked:true,max:100}}}});
+ $("d_pl").textContent=`u* = ${D.ustar}%. Empleo a pleno empleo = actividad × (1 − u*).`;
+ lines("c_pl",P,[{label:"Empleo observado",data:D.series[f].emp,color:COL[1]},{label:"A pleno empleo (PEA oficial)",data:D.series[f].emp_pleno,color:COL[4],dash:[5,4]},{label:"A pleno empleo (PEA ampliada)",data:D.series[f].emp_pleno_amp,color:COL[3],dash:[2,3]}]);
+ mk("c_br",{type:"bar",data:{labels:P,datasets:[{label:"Brecha (PEA oficial)",data:D.series[f].brecha_emp,backgroundColor:COL[4]},{label:"Brecha (PEA ampliada)",data:D.series[f].brecha_emp_amp,backgroundColor:COL[3]}]}});
+ const m=(k)=>D.series[f][k].map((v,i)=>v==null?null:v/100*pobm[i]);
+ mk("c_brm",{type:"bar",data:{labels:P,datasets:[{label:"Miles de puestos (PEA oficial)",data:m("brecha_emp"),backgroundColor:COL[4]},{label:"Miles de puestos (PEA ampliada)",data:m("brecha_emp_amp"),backgroundColor:COL[3]}]}})}
+
+function rForm(){const D=S.data,P=D.periodos,f=focoId();
+ $("formMissing").innerHTML=D.tiene_empleo?"":`<div class="note warn">La base cargada no trae la variable <b>EMPLEO</b> (formal/informal). Existe en el diseño de registro 1T2026; en bases de años anteriores puede no estar. Cuando falte, estos gráficos quedan vacíos en lugar de inventar la serie.</div>`;
+ lines("c_inf",P,D.grupos.map((g,j)=>({label:g.label,data:D.series[g.id].informal_ocu,color:gcol(j),lo:D.grupos.length<=2?D.ci[g.id].informal_ocu.lo:null,hi:D.ci[g.id].informal_ocu.hi})));
+ mk("c_fi",{type:"bar",data:{labels:P,datasets:[{label:"Formal",data:D.series[f].emp_formal,backgroundColor:COL[4]},{label:"Informal",data:D.series[f].emp_informal,backgroundColor:COL[2]}]},options:{scales:{x:{stacked:true},y:{stacked:true}}}});
+ mk("c_fin",{type:"bar",data:{labels:P,datasets:[{label:"Formales (miles)",data:D.niveles[f].formal,backgroundColor:COL[4]},{label:"Informales (miles)",data:D.niveles[f].informal,backgroundColor:COL[2]}]},options:{scales:{x:{stacked:true},y:{stacked:true}}}})}
+
+function rTerr(){const D=S.data,P=D.periodos,k=$("mTerr").value,p=$("perR").value;
+ $("hTerr").textContent=`${M[k][0]} · ${p}`;
+ const T=D.territorio[p]||{},ents=Object.entries(T).map(([c,r])=>({c:+c,n:D.aglos[c]||c,v:r[k]})).filter(e=>e.v!=null).sort((a,b)=>b.v-a.v);
+ $("rankBox").style.height=Math.max(300,ents.length*21+70)+"px";
+ const tot=D.series.total[k][pi(p)];
+ mk("c_rank",{type:"bar",data:{labels:ents.map(e=>e.n),datasets:[{data:ents.map(e=>e.v),backgroundColor:ents.map(e=>S.sel.has(e.c)?COL[1]:"#b8c4d0")}]},
+  options:{indexAxis:"y",plugins:{legend:{display:false}}},plugins:[{id:"tot",afterDatasetsDraw(ch){if(tot==null)return;const x=ch.scales.x.getPixelForValue(tot),a=ch.chartArea,c=ch.ctx;c.save();c.setLineDash([5,4]);c.strokeStyle="#b5443c";c.beginPath();c.moveTo(x,a.top);c.lineTo(x,a.bottom);c.stroke();c.restore()}}]});
+ const rows=Object.keys(D.aglos).filter(c=>P.some(q=>(D.territorio[q]||{})[c])).sort((a,b)=>D.aglos[a].localeCompare(D.aglos[b],"es")).map(c=>({k:c,l:D.aglos[c]}));
+ heat($("h_terr"),rows,P,(c,q)=>{const r=(D.territorio[q]||{})[c];return r?r[k]:null});
+ const L=["pob","pea","ocu","des","sub"];
+ const rr=Object.entries(T).sort((a,b)=>D.aglos[a[0]].localeCompare(D.aglos[b[0]],"es"));
+ const tt=D.niveles.total,i=pi(p);
+ $("tLev").innerHTML=`<table class="t"><tr><th>Aglomerado</th><th class="n">Población</th><th class="n">PEA</th><th class="n">Ocupados</th><th class="n">Desocupados</th><th class="n">Subocupados</th><th class="n">Casos</th></tr>${rr.map(([c,r])=>`<tr><td>${D.aglos[c]}</td>${L.map(l=>`<td class="n">${mi(r["n_"+l])}</td>`).join("")}<td class="n">${r.casos.toLocaleString("es-AR")}</td></tr>`).join("")}<tr class="sec"><td>Total 31 aglomerados</td>${L.map(l=>`<td class="n">${mi(tt[l][i])}</td>`).join("")}<td class="n">${D.casos.total[i].toLocaleString("es-AR")}</td></tr></table>`}
+
+const REF=[["act","Actividad (%)",1],["emp","Empleo (%)",1],["des","Desocupación (%)",1],["sub","Subocupación (%)",1],["subdem","Sub. demandante (%)",1],["subnodem","Sub. no demandante (%)",1]];
+const REFN=[["pob","Población (miles)"],["pea","PEA (miles)"],["ocu","Ocupados (miles)"],["des","Desocupados (miles)"],["sub","Subocupados (miles)"]];
+function ctrlTable(id,rows,getv,tol,fmtv){
+ const box=$(id);const saved={};box.querySelectorAll("input").forEach(i=>saved[i.dataset.k]=i.value);
+ box.innerHTML=`<table class="t"><tr><th>Indicador</th><th class="n">Calculado</th><th class="n">INDEC</th><th class="n">Diferencia</th><th>Resultado</th></tr>${rows.map(([k,l])=>{const v=getv(k);return`<tr><td>${l}</td><td class="n">${fmtv(v)}</td><td class="n"><input type="number" step="any" data-k="${k}" value="${saved[k]??""}" style="width:90px"></td><td class="n" id="${id}_d_${k}">–</td><td id="${id}_r_${k}"></td></tr>`}).join("")}</table>`;
+ const upd=()=>box.querySelectorAll("input").forEach(inp=>{const k=inp.dataset.k,v=getv(k);const d=$(`${id}_d_${k}`),r=$(`${id}_r_${k}`);if(inp.value===""||v==null){d.textContent="–";r.textContent="";return}
+  const diff=v-parseFloat(inp.value);d.textContent=diff.toFixed(3);const t=typeof tol=="function"?tol(k):tol;r.innerHTML=Math.abs(diff)<=t?`<span class="ok">✓ coincide</span>`:`<span class="err">✗ difiere (tol. ±${t})</span>`});
+ box.querySelectorAll("input").forEach(i=>i.oninput=upd);upd()}
+function rCtrl(){const D=S.data,i=pi($("perC").value);
+ const tabsRates=REF.map(([k,l])=>[k,l]);
+ $("ctrlForm").innerHTML=`<div id="cf1"></div><div id="cf2" style="margin-top:12px"></div>`;
+ ctrlTable("cf1",tabsRates,k=>D.series.total[k][i],0.05,v=>f2(v));
+ ctrlTable("cf2",REFN,k=>D.niveles.total[k][i],0.5,v=>v==null?"–":v.toFixed(1));
+ $("ctrlAgl").innerHTML=`<div id="ca1"></div>`;
+ const c=$("aglC").value,r=(D.territorio[$("perC").value]||{})[c];
+ ctrlTable("ca1",REFN,k=>r?r["n_"+k]:null,0.5,v=>v==null?"–":v.toFixed(1))}
+$("xls").onchange=async e=>{$("xlsOut").textContent="Leyendo…";
+ const r=await API.file("/api/lab/cuadros",e.target.files[0]);
+ if(r.error){$("xlsOut").innerHTML=`<span class="err">${r.error}</span>`;return}
+ $("xlsOut").innerHTML=`<div class="small">Hojas del archivo: ${r.hojas.join(" · ")}</div>`+(r.tablas.length?r.tablas.map(t=>`<h4 style="margin:10px 0 4px">${t.hoja}</h4><div class="scroll"><table class="t">${t.filas.map(f=>`<tr>${f.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`).join(""):`<div class="note warn">No encontré hojas con «1.1» o «3.2» en el nombre. Revisá la lista de hojas de arriba.</div>`)};
+
+function rMet(){const hoy=new Date().toLocaleDateString("es-AR");
+ $("metBox").innerHTML=`
+<h4>Fuente y base</h4>
+<p>INDEC (Instituto Nacional de Estadística y Censos). <i>Encuesta Permanente de Hogares (EPH)</i>, base usuaria Individual (<code>usu_individual</code>), primer trimestre de 2026, total de 31 aglomerados urbanos. Diseño de registro: INDEC, <i>Encuesta Permanente de Hogares. Diseño de registros y estructura para las bases preliminares Hogar y Personas</i>, agosto de 2026. Cuadros de control: INDEC, <i>cuadros_tasas_indicadores_eph_06_26.xls</i>, cuadros 1.1 y 3.2. Fecha de consulta: ${hoy}.</p>
+<h4>Variables y códigos</h4>
+<table class="t"><tr><th>Variable</th><th>Códigos usados</th></tr>
+<tr><td>PONDERA</td><td>Ponderador de la persona</td></tr>
+<tr><td>AGLOMERADO</td><td>31 códigos: 02 a 38, 91 y 93 (02 Gran La Plata … 32 CABA, 33 Partidos del GBA … 93 Viedma-Carmen de Patagones)</td></tr>
+<tr><td>ESTADO</td><td>0 sin entrevista individual · 1 ocupado · 2 desocupado · 3 inactivo · 4 menor de 10 años</td></tr>
+<tr><td>INTENSI</td><td>1 subocupado por insuficiencia horaria · 2 ocupado pleno · 3 sobreocupado · 4 ocupado que no trabajó en la semana · 9 ns/nr</td></tr>
+<tr><td>PP03J</td><td>Aparte de este trabajo, ¿buscó otro empleo? 1 sí · 2 no · <b>9 ns/nr</b></td></tr>
+<tr><td>EMPLEO</td><td>1 formal · 2 informal · 9 ns/nr</td></tr>
+<tr><td>PP02E</td><td>No buscó trabajo porque… 3 «se cansó de buscar trabajo»</td></tr>
+<tr><td>PP02A</td><td>Disponibilidad: 1 sí podía empezar · 2 sí, con ciertas condiciones</td></tr></table>
+<h4 style="margin-top:14px">Ponderación y fórmulas</h4>
+<p>Todo se pondera con PONDERA. Sea Σ la suma de PONDERA sobre el grupo y período considerados.</p>
+<table class="t"><tr><th>Indicador</th><th>Fórmula</th></tr>
+<tr><td>Población total</td><td>Σ de todas las personas de la base (incluye ESTADO 0 y 4)</td></tr>
+<tr><td>PEA</td><td>Σ(ESTADO ∈ {1,2})</td></tr>
+<tr><td>Tasa de actividad</td><td>PEA / población total</td></tr>
+<tr><td>Tasa de empleo</td><td>Σ(ESTADO=1) / población total</td></tr>
+<tr><td>Tasa de desocupación</td><td>Σ(ESTADO=2) / PEA</td></tr>
+<tr><td>Subocupados</td><td>Σ(ESTADO=1 y INTENSI=1)</td></tr>
+<tr><td>Subocupación (total)</td><td>Subocupados / PEA</td></tr>
+<tr><td>Subocupación demandante</td><td>Σ(subocupados con PP03J=1) / PEA</td></tr>
+<tr><td>Subocupación no demandante</td><td>(Subocupados − demandantes) / PEA. No se filtra PP03J=2: así los casos PP03J=9 y faltantes no se pierden</td></tr>
+<tr><td>Identidades</td><td>empleo = actividad × (1 − desocupación) · subocupación = demandante + no demandante</td></tr></table>
+<h4 style="margin-top:14px">Ampliaciones</h4>
+<table class="t"><tr><th>Indicador</th><th>Fórmula</th></tr>
+<tr><td>Desmotivados</td><td>Σ(ESTADO=3 y PP02E=3) (opcional: y PP02A ∈ {1,2})</td></tr>
+<tr><td>PEA ampliada</td><td>PEA + desmotivados. Actividad ampliada = PEA ampliada / población. Desocupación ampliada = (desocupados + desmotivados) / PEA ampliada</td></tr>
+<tr><td>Contrafactual</td><td>Con dd = tasa de desmotivados(t) − tasa(base): actividad cf = actividad + dd; desocupación cf = (desocupación × actividad + dd) / actividad cf. Supone que esas personas serían desocupadas</td></tr>
+<tr><td>Empleo a pleno empleo</td><td>actividad × (1 − u*), con u* parámetro (no es un dato). Brecha = empleo a pleno empleo − empleo observado</td></tr>
+<tr><td>Informalidad</td><td>Σ(ocupados con EMPLEO=2) / Σ(ocupados con EMPLEO ∈ {1,2})</td></tr></table>
+<h4 style="margin-top:14px">Intervalos y comparaciones</h4>
+<p>IC 95% por bootstrap con 200 réplicas, remuestreando viviendas (CODUSU). La base pública no trae el área de muestreo, así que el intervalo es un piso del error real. Las variaciones usan réplicas independientes por período (conservador cuando el panel repite hogares). En «promedio anual» se promedian los niveles de los trimestres elegidos y las tasas se calculan sobre esos niveles.</p>
+<h4>Límites</h4>
+<ul><li>La EPH cubre aglomerados urbanos, no el total del país.</li><li>Los aglomerados chicos tienen pocos casos: mirá la columna «Casos» y los intervalos antes de comparar.</li><li>La variable EMPLEO puede no existir en bases anteriores a 2026.</li></ul>`}
+
+/* ---------- init ---------- */
+(async()=>{const r=await post("/api/lab/estado");S.aglos=r.aglos;drawAgl();setLoaded(r);go("carga");if(S.loaded.length){await compute();if(S.data)go("tasas")}})();
+</script>
+</body>
+</html>

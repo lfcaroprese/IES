@@ -9,7 +9,7 @@ No hay servidor ni base de datos. Los microdatos de la EPH **no se suben a ning�
 
 ## Publicar en Vercel
 1. Subí este repo a GitHub.
-2. En Vercel: *Add New → Project → Import* del repo. No hace falta configurar nada: `vercel.json` ya indica que es un sitio estático que sirve la carpeta `public/` (sin build).
+2. En Vercel: *Add New → Project → Import* del repo. No hace falta configurar nada: `vercel.json` declara el sitio como estático (`@vercel/static` sobre la raíz) y por eso ignora el preset que Vercel haya auto-detectado. Ojo: si `reference/` (Flask) está en el repo, Vercel puede detectar «Flask» al importar; con este `vercel.json` no importa.
 3. Deploy. Cada `git push` a `main` actualiza el sitio.
 
 ## Qué se guarda y dónde
@@ -21,7 +21,7 @@ No hay servidor ni base de datos. Los microdatos de la EPH **no se suben a ning�
 
 ## Correr en local
 ```
-python3 -m http.server 8000 -d public      # o: npx serve public
+python3 -m http.server 8000 -d .      # o: npx serve public
 ```
 Abrir http://localhost:8000. (No abrir los `.html` con doble clic: los Web Workers necesitan http.)
 
